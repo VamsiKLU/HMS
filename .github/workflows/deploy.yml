@@ -19,12 +19,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies (client)
-        run: npm ci
-        working-directory: ./client
+        run: npm ci --prefix client
 
       - name: Build project (client)
-        run: npm run build
-        working-directory: ./client
+        run: npm run build --prefix client
 
       - name: Add SPA fallback (404.html)
         run: cp client/dist/index.html client/dist/404.html
