@@ -1,11 +1,5 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
-// https://vitejs.dev/config/
 export default defineConfig({
-  base: '/HMS/',  // <-- IMPORTANT
+  base: '/HMS/',  // REPLACE with your repo name
   plugins: [react()],
-  css: {
-    postcss: './postcss.config.cjs'
-  }
+  css: { postcss: './postcss.config.cjs' }
 })
