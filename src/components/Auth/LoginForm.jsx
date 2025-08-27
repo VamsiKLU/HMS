@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useAuth } from '../../contexts/AuthContext.jsx';
-import { Activity, Mail, Lock, UserCheck } from 'lucide-react';
+import { Mail, Lock, UserCheck } from 'lucide-react';
+import HeartbeatLogo from '../Brand/HeartbeatLogo.jsx';
 
 export function LoginForm({ onNavigateToRegister }) {
   const { login, isLoading } = useAuth();
@@ -39,10 +40,7 @@ export function LoginForm({ onNavigateToRegister }) {
       <div className="max-w-md w-full space-y-8">
         <div>
           <div className="flex justify-center">
-            <div className="flex items-center">
-              <Activity size={32} className="text-blue-600" />
-              <span className="ml-2 text-2xl font-bold text-gray-900 dark:text-white">MedVault</span>
-            </div>
+            <HeartbeatLogo size={20} />
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
             Sign in to your account

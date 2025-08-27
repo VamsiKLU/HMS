@@ -12,6 +12,7 @@ import {
   PlusCircle, 
   BarChart3 
 } from 'lucide-react';
+import HeartbeatLogo from '../Brand/HeartbeatLogo.jsx';
 
 export function Sidebar({ isOpen, onClose, user }) {
   const getDoctorNavItems = () => [
@@ -74,9 +75,8 @@ export function Sidebar({ isOpen, onClose, user }) {
        `}>
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center justify-center h-16 bg-blue-600 text-white">
-            <Activity size={24} className="mr-2" />
-            <span className="text-xl font-bold">MedVault</span>
+          <div className="flex items-center justify-center h-16 bg-white dark:bg-gray-800">
+            <HeartbeatLogo size={18} />
           </div>
 
           {/* Navigation */}
