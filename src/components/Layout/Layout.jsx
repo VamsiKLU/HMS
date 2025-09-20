@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Sidebar } from './Sidebar.jsx';
 import { Navbar } from './Navbar.jsx';
 import { Facebook, Twitter, Instagram, Linkedin, Heart, Mail, Phone, MapPin } from 'lucide-react';
 
-export function Layout({ children, onNavigateToSubPage }) {
+export function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
@@ -19,7 +21,6 @@ export function Layout({ children, onNavigateToSubPage }) {
           collapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           user={user}
-          onNavigateToSubPage={onNavigateToSubPage}
         />
 
         <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'}`}>
@@ -96,7 +97,7 @@ export function Layout({ children, onNavigateToSubPage }) {
                 <ul className="space-y-2">
                   <li>
                     <button
-                      onClick={() => onNavigateToSubPage('book-appointment')}
+                      onClick={() => navigate('/book-appointment')}
                       className="text-blue-100 hover:text-white transition-colors duration-200 hover:translate-x-1 inline-block"
                     >
                       Book Appointment
@@ -104,7 +105,7 @@ export function Layout({ children, onNavigateToSubPage }) {
                   </li>
                   <li>
                     <button
-                      onClick={() => onNavigateToSubPage('medical-records')}
+                      onClick={() => navigate('/medical-records')}
                       className="text-blue-100 hover:text-white transition-colors duration-200 hover:translate-x-1 inline-block"
                     >
                       Medical Records
@@ -112,7 +113,7 @@ export function Layout({ children, onNavigateToSubPage }) {
                   </li>
                   <li>
                     <button
-                      onClick={() => onNavigateToSubPage('chat')}
+                      onClick={() => navigate('/chat')}
                       className="text-blue-100 hover:text-white transition-colors duration-200 hover:translate-x-1 inline-block"
                     >
                       Messages
@@ -120,7 +121,7 @@ export function Layout({ children, onNavigateToSubPage }) {
                   </li>
                   <li>
                     <button
-                      onClick={() => onNavigateToSubPage('settings')}
+                      onClick={() => navigate('/settings')}
                       className="text-blue-100 hover:text-white transition-colors duration-200 hover:translate-x-1 inline-block"
                     >
                       Settings
@@ -178,6 +179,5 @@ export function Layout({ children, onNavigateToSubPage }) {
 }
 
 Layout.propTypes = {
-  children: PropTypes.node.isRequired,
-  onNavigateToSubPage: PropTypes.func
+  children: PropTypes.node.isRequired
 };

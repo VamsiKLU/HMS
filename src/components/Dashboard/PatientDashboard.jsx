@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Calendar,
   FileText,
@@ -14,7 +15,8 @@ import { mockMedicalRecords, mockNotifications } from '../../data/mockData.js';
 import { BookAppointmentModal } from '../Modals/BookAppointmentModal.jsx';
 import { ChatModal } from '../Modals/ChatModal.jsx';
 
-export function PatientDashboard({ onNavigateToSubPage }) {
+export function PatientDashboard() {
+  const navigate = useNavigate();
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showChatModal, setShowChatModal] = useState(false);
 
@@ -45,7 +47,7 @@ export function PatientDashboard({ onNavigateToSubPage }) {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <button
-          onClick={() => onNavigateToSubPage('book-appointment')}
+          onClick={() => navigate('/book-appointment')}
           className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-6 text-left transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg shadow-sm"
         >
           <Calendar className="h-8 w-8 mb-4 transition-transform duration-300 ease-in-out group-hover:scale-110" />
@@ -54,7 +56,7 @@ export function PatientDashboard({ onNavigateToSubPage }) {
         </button>
 
         <button
-          onClick={() => onNavigateToSubPage('medical-records')}
+          onClick={() => navigate('/medical-records')}
           className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg p-6 text-left transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg shadow-sm"
         >
            <FileText className="h-8 w-8 text-green-600 mb-4 transition-transform duration-300 ease-in-out group-hover:scale-110" />
@@ -63,7 +65,7 @@ export function PatientDashboard({ onNavigateToSubPage }) {
          </button>
 
         <button
-          onClick={() => onNavigateToSubPage('chat')}
+          onClick={() => navigate('/chat')}
           className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg p-6 text-left transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg shadow-sm"
         >
            <MessageSquare className="h-8 w-8 text-purple-600 mb-4 transition-transform duration-300 ease-in-out group-hover:scale-110" />
@@ -72,7 +74,7 @@ export function PatientDashboard({ onNavigateToSubPage }) {
          </button>
 
         <button
-          onClick={() => onNavigateToSubPage('reports')}
+          onClick={() => navigate('/reports')}
           className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg p-6 text-left transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg shadow-sm"
         >
            <Download className="h-8 w-8 text-orange-600 mb-4 transition-transform duration-300 ease-in-out group-hover:scale-110" />

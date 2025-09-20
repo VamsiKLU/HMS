@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { LoginForm } from './Auth/LoginForm.jsx';
 import { RegisterForm } from './Auth/RegisterForm.jsx';
@@ -21,31 +22,11 @@ import { DoctorPatientsPage } from '../pages/DoctorPatientsPage.jsx';
 import { DoctorMedicalRecordsPage } from '../pages/DoctorMedicalRecordsPage.jsx';
 import { DoctorReportsPage } from '../pages/DoctorReportsPage.jsx';
 
-export function AppRouter() {
+// Protected Route Component
+function ProtectedRoute({ children, allowedRoles = [] }) {
   const { user, isLoading } = useAuth();
-  const [currentPage, setCurrentPage] = React.useState('login');
-  const [currentSubPage, setCurrentSubPage] = React.useState(null);
-
-  console.log('AppRouter render:', { user, isLoading, currentPage, currentSubPage });
-
-  // Function to handle page navigation
-  const navigateTo = (page) => {
-    setCurrentPage(page);
-    setCurrentSubPage(null);
-  };
-
-  // Function to handle sub-page navigation
-  const navigateToSubPage = (subPage) => {
-    setCurrentSubPage(subPage);
-  };
-
-  // Function to go back to dashboard
-  const navigateBack = () => {
-    setCurrentSubPage(null);
-  };
 
   if (isLoading) {
-    console.log('Showing loading screen');
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 flex items-center justify-center">
         <div className="text-center">
@@ -57,73 +38,200 @@ export function AppRouter() {
   }
 
   if (!user) {
-    console.log('No user, showing auth form');
-    if (currentPage === 'register') {
-      return <RegisterForm onNavigateToLogin={() => navigateTo('login')} />;
-    }
-    return <LoginForm onNavigateToRegister={() => navigateTo('register')} />;
+    return <Navigate to="/login" replace />;
   }
 
-  console.log('User authenticated, showing dashboard for role:', user.role);
+  if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
-  const getDashboardComponent = () => {
-    // Handle sub-pages for patients
-    if (user.role === 'patient' && currentSubPage) {
-      switch (currentSubPage) {
-        case 'book-appointment':
-          return <BookAppointmentPage onNavigateBack={navigateBack} />;
-        case 'appointments':
-          return <AppointmentsPage onNavigateBack={navigateBack} onNavigateToSubPage={navigateToSubPage} />;
-        case 'medical-records':
-          return <MedicalRecordsPage onNavigateBack={navigateBack} />;
-        case 'chat':
-          return <ChatPage onNavigateBack={navigateBack} />;
-        case 'reports':
-          return <ReportsPage onNavigateBack={navigateBack} />;
-        case 'settings':
-          return <SettingsPage onNavigateBack={navigateBack} />;
-        default:
-          return <PatientDashboard onNavigateToSubPage={navigateToSubPage} />;
-      }
-    }
+  return children;
+}
 
-    // Handle sub-pages for doctors
-    if (user.role === 'doctor' && currentSubPage) {
-      switch (currentSubPage) {
-        case 'appointments':
-          return <DoctorAppointmentsPage onNavigateBack={navigateBack} />;
-        case 'patients':
-          return <DoctorPatientsPage onNavigateBack={navigateBack} />;
-        case 'medical-records':
-          return <DoctorMedicalRecordsPage onNavigateBack={navigateBack} />;
-        case 'reports':
-          return <DoctorReportsPage onNavigateBack={navigateBack} />;
-        case 'settings':
-          return <SettingsPage onNavigateBack={navigateBack} />;
-        default:
-          return <DoctorDashboard onNavigateToSubPage={navigateToSubPage} />;
-      }
-    }
+// Auth Route Component
+function AuthRoute({ children }) {
+  const { user, isLoading } = useAuth();
 
-    switch (user.role) {
-      case 'doctor':
-        console.log('Rendering DoctorDashboard');
-        return <DoctorDashboard onNavigateToSubPage={navigateToSubPage} />;
-      case 'patient':
-        console.log('Rendering PatientDashboard');
-        return <PatientDashboard onNavigateToSubPage={navigateToSubPage} />;
-      case 'admin':
-        console.log('Rendering AdminDashboard');
-        return <AdminDashboard />;
-      default:
-        console.log('Invalid role:', user.role);
-        return <div>Invalid role</div>;
-    }
-  };
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+}
+
+export function AppRouter() {
   return (
-    <Layout onNavigateToSubPage={navigateToSubPage}>
-      {getDashboardComponent()}
-    </Layout>
+    <BrowserRouter>
+      <Routes>
+        {/* Auth Routes */}
+        <Route
+          path="/login"
+          element={
+            <AuthRoute>
+              <LoginForm onNavigateToRegister={() => window.location.href = '/register'} />
+            </AuthRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <AuthRoute>
+              <RegisterForm onNavigateToLogin={() => window.location.href = '/login'} />
+            </AuthRoute>
+          }
+        />
+
+        {/* Default redirect */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+
+        {/* Protected Dashboard Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <DashboardRouter />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Patient Routes */}
+        <Route
+          path="/book-appointment"
+          element={
+            <ProtectedRoute allowedRoles={['patient']}>
+              <Layout>
+                <BookAppointmentPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/appointments"
+          element={
+            <ProtectedRoute allowedRoles={['patient']}>
+              <Layout>
+                <AppointmentsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/medical-records"
+          element={
+            <ProtectedRoute allowedRoles={['patient']}>
+              <Layout>
+                <MedicalRecordsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chat"
+          element={
+            <ProtectedRoute allowedRoles={['patient']}>
+              <Layout>
+                <ChatPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute allowedRoles={['patient']}>
+              <Layout>
+                <ReportsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Doctor Routes */}
+        <Route
+          path="/doctor/appointments"
+          element={
+            <ProtectedRoute allowedRoles={['doctor']}>
+              <Layout>
+                <DoctorAppointmentsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/doctor/patients"
+          element={
+            <ProtectedRoute allowedRoles={['doctor']}>
+              <Layout>
+                <DoctorPatientsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/doctor/medical-records"
+          element={
+            <ProtectedRoute allowedRoles={['doctor']}>
+              <Layout>
+                <DoctorMedicalRecordsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/doctor/reports"
+          element={
+            <ProtectedRoute allowedRoles={['doctor']}>
+              <Layout>
+                <DoctorReportsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Settings/Profile Routes */}
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <SettingsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catch all route */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
+}
+
+// Dashboard Router Component
+function DashboardRouter() {
+  const { user } = useAuth();
+
+  switch (user?.role) {
+    case 'doctor':
+      return <DoctorDashboard />;
+    case 'patient':
+      return <PatientDashboard />;
+    case 'admin':
+      return <AdminDashboard />;
+    default:
+      return <div>Invalid role</div>;
+  }
 }

@@ -29,8 +29,10 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Add SPA fallback (404.html)
-        run: cp dist/index.html dist/404.html
+      - name: Setup SPA fallback
+        run: |
+          cp dist/index.html dist/404.html
+          ls -la dist/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Home,
   Calendar,
@@ -16,22 +17,25 @@ import {
 } from 'lucide-react';
 import HeartBeatLogo from '../Brand/HeartBeatLogo.jsx';
 
-export function Sidebar({ isOpen, onClose, collapsed, onToggleCollapse, user, onNavigateToSubPage }) {
+export function Sidebar({ isOpen, onClose, collapsed, onToggleCollapse, user }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const getDoctorNavItems = () => [
-    { icon: <Home size={20} />, label: 'Dashboard', active: true, onClick: () => onNavigateToSubPage && onNavigateToSubPage(null) },
-    { icon: <Calendar size={20} />, label: 'Appointments', onClick: () => onNavigateToSubPage && onNavigateToSubPage('appointments') },
-    { icon: <Users size={20} />, label: 'Patients', onClick: () => onNavigateToSubPage && onNavigateToSubPage('patients') },
-    { icon: <FileText size={20} />, label: 'Medical Records', onClick: () => onNavigateToSubPage && onNavigateToSubPage('medical-records') },
-    { icon: <Activity size={20} />, label: 'Reports', onClick: () => onNavigateToSubPage && onNavigateToSubPage('reports') },
-    { icon: <User size={20} />, label: 'Profile', onClick: () => onNavigateToSubPage && onNavigateToSubPage('settings') }
+    { icon: <Home size={20} />, label: 'Dashboard', path: '/dashboard', active: location.pathname === '/dashboard' },
+    { icon: <Calendar size={20} />, label: 'Appointments', path: '/doctor/appointments', active: location.pathname === '/doctor/appointments' },
+    { icon: <Users size={20} />, label: 'Patients', path: '/doctor/patients', active: location.pathname === '/doctor/patients' },
+    { icon: <FileText size={20} />, label: 'Medical Records', path: '/doctor/medical-records', active: location.pathname === '/doctor/medical-records' },
+    { icon: <Activity size={20} />, label: 'Reports', path: '/doctor/reports', active: location.pathname === '/doctor/reports' },
+    { icon: <User size={20} />, label: 'Profile', path: '/settings', active: location.pathname === '/settings' }
   ];
 
   const getPatientNavItems = () => [
-    { icon: <Home size={20} />, label: 'Home', onClick: () => onNavigateToSubPage && onNavigateToSubPage(null) },
-    { icon: <Calendar size={20} />, label: 'Appointments', onClick: () => onNavigateToSubPage && onNavigateToSubPage('appointments') },
-    { icon: <FileText size={20} />, label: 'My Records', onClick: () => onNavigateToSubPage && onNavigateToSubPage('medical-records') },
-    { icon: <MessageSquare size={20} />, label: 'Messages', onClick: () => onNavigateToSubPage && onNavigateToSubPage('chat') },
-    { icon: <User size={20} />, label: 'Profile', onClick: () => onNavigateToSubPage && onNavigateToSubPage('settings') }
+    { icon: <Home size={20} />, label: 'Home', path: '/dashboard', active: location.pathname === '/dashboard' },
+    { icon: <Calendar size={20} />, label: 'Appointments', path: '/appointments', active: location.pathname === '/appointments' },
+    { icon: <FileText size={20} />, label: 'My Records', path: '/medical-records', active: location.pathname === '/medical-records' },
+    { icon: <MessageSquare size={20} />, label: 'Messages', path: '/chat', active: location.pathname === '/chat' },
+    { icon: <User size={20} />, label: 'Profile', path: '/settings', active: location.pathname === '/settings' }
   ];
 
   const getAdminNavItems = () => [
@@ -98,7 +102,7 @@ export function Sidebar({ isOpen, onClose, collapsed, onToggleCollapse, user, on
                     ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 shadow-sm'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:shadow-md'
                 }`}
-                onClick={item.onClick}
+                onClick={() => navigate(item.path)}
                 title={collapsed ? item.label : ''}
               >
                 <div className="transition-transform duration-200 ease-in-out group-hover:scale-110">
@@ -120,6 +124,5 @@ Sidebar.propTypes = {
   onClose: PropTypes.func.isRequired,
   collapsed: PropTypes.bool,
   onToggleCollapse: PropTypes.func,
-  user: PropTypes.object,
-  onNavigateToSubPage: PropTypes.func
+  user: PropTypes.object
 };
