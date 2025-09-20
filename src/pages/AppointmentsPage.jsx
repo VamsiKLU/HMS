@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Calendar, Clock, User, MapPin, Phone, Video, MessageSquare, Plus } from 'lucide-react';
 import { mockAppointments } from '../data/mockData.js';
 
-export function AppointmentsPage({ onNavigateBack, onNavigateToSubPage }) {
+export function AppointmentsPage() {
+  const navigate = useNavigate();
   const [filterStatus, setFilterStatus] = useState('all');
 
   // Get appointments for the current patient (assuming patient ID 1)
@@ -37,7 +39,7 @@ export function AppointmentsPage({ onNavigateBack, onNavigateToSubPage }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
-            onClick={onNavigateBack}
+            onClick={() => navigate('/dashboard')}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
             <ChevronLeft size={20} />
@@ -48,7 +50,7 @@ export function AppointmentsPage({ onNavigateBack, onNavigateToSubPage }) {
           </div>
         </div>
         <button
-          onClick={() => onNavigateToSubPage('book-appointment')}
+          onClick={() => navigate('/book-appointment')}
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2"
         >
           <Plus size={16} />
@@ -131,7 +133,7 @@ export function AppointmentsPage({ onNavigateBack, onNavigateToSubPage }) {
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No appointments found</h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">You don't have any appointments matching the selected filter.</p>
             <button
-              onClick={() => onNavigateToSubPage('book-appointment')}
+              onClick={() => navigate('/book-appointment')}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               Book Your First Appointment
@@ -193,7 +195,7 @@ export function AppointmentsPage({ onNavigateBack, onNavigateToSubPage }) {
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <button
-            onClick={() => onNavigateToSubPage('book-appointment')}
+            onClick={() => navigate('/book-appointment')}
             className="p-4 border border-blue-300 dark:border-blue-700 rounded-lg text-left hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
           >
             <Plus className="h-6 w-6 text-blue-600 mb-2" />

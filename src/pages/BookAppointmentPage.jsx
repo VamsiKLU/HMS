@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Calendar, Clock, User, Video, MessageSquare, Star, ChevronLeft } from 'lucide-react';
 import { mockDoctors } from '../data/mockData.js';
 import { BookAppointmentModal } from '../components/Modals/BookAppointmentModal.jsx';
 
-export function BookAppointmentPage({ onNavigateBack }) {
+export function BookAppointmentPage() {
+  const navigate = useNavigate();
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
 
@@ -17,7 +19,7 @@ export function BookAppointmentPage({ onNavigateBack }) {
       {/* Header */}
       <div className="flex items-center space-x-4">
         <button
-          onClick={onNavigateBack}
+          onClick={() => navigate('/dashboard')}
           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
         >
           <ChevronLeft size={20} />

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Calendar, Clock, User, Eye, Edit, Plus, Filter } from 'lucide-react';
 import { mockAppointments, mockPatients } from '../data/mockData.js';
 
-export function DoctorAppointmentsPage({ onNavigateBack }) {
+export function DoctorAppointmentsPage() {
+  const navigate = useNavigate();
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedAppointment, setSelectedAppointment] = useState(null);
 
@@ -34,7 +36,7 @@ export function DoctorAppointmentsPage({ onNavigateBack }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
-            onClick={onNavigateBack}
+            onClick={() => navigate('/dashboard')}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
             <ChevronLeft size={20} />

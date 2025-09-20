@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Download, FileText, Calendar, Filter, Search, Eye } from 'lucide-react';
 
-export function ReportsPage({ onNavigateBack }) {
+export function ReportsPage() {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
 
@@ -81,7 +83,7 @@ export function ReportsPage({ onNavigateBack }) {
       {/* Header */}
       <div className="flex items-center space-x-4">
         <button
-          onClick={onNavigateBack}
+          onClick={() => navigate('/dashboard')}
           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
         >
           <ChevronLeft size={20} />

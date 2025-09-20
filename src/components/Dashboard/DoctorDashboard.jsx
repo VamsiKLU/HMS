@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Calendar,
   Users,
@@ -14,7 +15,8 @@ import { mockAppointments, mockMedicalRecords } from '../../data/mockData.js';
 import { PatientRecordModal } from '../Modals/PatientRecordModal.jsx';
 import { AddNotesModal } from '../Modals/AddNotesModal.jsx';
 
-export function DoctorDashboard({ onNavigateToSubPage }) {
+export function DoctorDashboard() {
+  const navigate = useNavigate();
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [showNotesModal, setShowNotesModal] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
@@ -40,7 +42,7 @@ export function DoctorDashboard({ onNavigateToSubPage }) {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <button
-          onClick={() => onNavigateToSubPage('appointments')}
+          onClick={() => navigate('/doctor/appointments')}
           className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-6 text-left transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg shadow-sm"
         >
           <Calendar className="h-8 w-8 mb-4 transition-transform duration-300 ease-in-out group-hover:scale-110" />
@@ -49,7 +51,7 @@ export function DoctorDashboard({ onNavigateToSubPage }) {
         </button>
 
         <button
-          onClick={() => onNavigateToSubPage('patients')}
+          onClick={() => navigate('/doctor/patients')}
           className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg p-6 text-left transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg shadow-sm"
         >
            <Users className="h-8 w-8 text-green-600 mb-4 transition-transform duration-300 ease-in-out group-hover:scale-110" />
@@ -58,7 +60,7 @@ export function DoctorDashboard({ onNavigateToSubPage }) {
          </button>
 
         <button
-          onClick={() => onNavigateToSubPage('medical-records')}
+          onClick={() => navigate('/doctor/medical-records')}
           className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg p-6 text-left transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg shadow-sm"
         >
            <FileText className="h-8 w-8 text-purple-600 mb-4 transition-transform duration-300 ease-in-out group-hover:scale-110" />
@@ -67,7 +69,7 @@ export function DoctorDashboard({ onNavigateToSubPage }) {
          </button>
 
         <button
-          onClick={() => onNavigateToSubPage('reports')}
+          onClick={() => navigate('/doctor/reports')}
           className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg p-6 text-left transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg shadow-sm"
         >
            <Activity className="h-8 w-8 text-orange-600 mb-4 transition-transform duration-300 ease-in-out group-hover:scale-110" />

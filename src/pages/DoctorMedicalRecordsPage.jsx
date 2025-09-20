@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, FileText, Search, Plus, Eye, Edit, Upload } from 'lucide-react';
 import { mockMedicalRecords, mockPatients } from '../data/mockData.js';
 
-export function DoctorMedicalRecordsPage({ onNavigateBack }) {
+export function DoctorMedicalRecordsPage() {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
 
@@ -35,7 +37,7 @@ export function DoctorMedicalRecordsPage({ onNavigateBack }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
-            onClick={onNavigateBack}
+            onClick={() => navigate('/dashboard')}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
             <ChevronLeft size={20} />

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, MessageCircle, Send, User, Bot } from 'lucide-react';
 import { ChatModal } from '../components/Modals/ChatModal.jsx';
 
-export function ChatPage({ onNavigateBack }) {
+export function ChatPage() {
+  const navigate = useNavigate();
   const [showChatModal, setShowChatModal] = useState(false);
 
   const doctors = [
@@ -31,7 +33,7 @@ export function ChatPage({ onNavigateBack }) {
       {/* Header */}
       <div className="flex items-center space-x-4">
         <button
-          onClick={onNavigateBack}
+          onClick={() => navigate('/dashboard')}
           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
         >
           <ChevronLeft size={20} />

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, User, Bell, Shield, Palette, Globe, Save } from 'lucide-react';
 
-export function SettingsPage({ onNavigateBack }) {
+export function SettingsPage() {
+  const navigate = useNavigate();
   const [settings, setSettings] = useState({
     profile: {
       name: 'John Smith',
@@ -49,7 +51,7 @@ export function SettingsPage({ onNavigateBack }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
-            onClick={onNavigateBack}
+            onClick={() => navigate('/dashboard')}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
             <ChevronLeft size={20} />

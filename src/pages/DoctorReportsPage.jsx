@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, BarChart3, Download, Calendar, TrendingUp, Users, FileText, Activity } from 'lucide-react';
 import { mockMedicalRecords, mockAppointments, mockPatients } from '../data/mockData.js';
 
-export function DoctorReportsPage({ onNavigateBack }) {
+export function DoctorReportsPage() {
+  const navigate = useNavigate();
   const [dateRange, setDateRange] = useState('month');
 
   // Get data for the current doctor (assuming doctor ID 1)
@@ -31,7 +33,7 @@ export function DoctorReportsPage({ onNavigateBack }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
-            onClick={onNavigateBack}
+            onClick={() => navigate('/dashboard')}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
             <ChevronLeft size={20} />
