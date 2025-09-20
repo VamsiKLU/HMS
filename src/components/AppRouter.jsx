@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { LoginForm } from './Auth/LoginForm.jsx';
 import { RegisterForm } from './Auth/RegisterForm.jsx';
@@ -70,16 +70,37 @@ function AuthRoute({ children }) {
   return children;
 }
 
+// Component to handle SPA redirects from 404.html
+function SPARedirectHandler() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Check if we have a redirect from 404.html
+    const searchParams = new URLSearchParams(location.search);
+    const redirectPath = searchParams.get('/');
+
+    if (redirectPath) {
+      // Remove the query parameter and navigate to the actual route
+      const cleanPath = redirectPath.replace(/~and~/g, '&');
+      navigate(cleanPath, { replace: true });
+    }
+  }, [location, navigate]);
+
+  return null;
+}
+
 export function AppRouter() {
   return (
     <BrowserRouter>
+      <SPARedirectHandler />
       <Routes>
         {/* Auth Routes */}
         <Route
           path="/login"
           element={
             <AuthRoute>
-              <LoginForm onNavigateToRegister={() => window.location.href = '/register'} />
+              <LoginForm onNavigateToRegister={() => window.location.href = '/HMS/register'} />
             </AuthRoute>
           }
         />
@@ -87,7 +108,7 @@ export function AppRouter() {
           path="/register"
           element={
             <AuthRoute>
-              <RegisterForm onNavigateToLogin={() => window.location.href = '/login'} />
+              <RegisterForm onNavigateToLogin={() => window.location.href = '/HMS/login'} />
             </AuthRoute>
           }
         />
