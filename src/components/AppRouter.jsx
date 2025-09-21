@@ -92,7 +92,7 @@ function SPARedirectHandler() {
 
 export function AppRouter() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <SPARedirectHandler />
       <Routes>
         {/* Auth Routes */}
@@ -100,7 +100,7 @@ export function AppRouter() {
           path="/login"
           element={
             <AuthRoute>
-              <LoginForm onNavigateToRegister={() => window.location.href = '/HMS/register'} />
+              <LoginForm onNavigateToRegister={() => window.location.href = `${import.meta.env.BASE_URL}register`} />
             </AuthRoute>
           }
         />
@@ -108,7 +108,7 @@ export function AppRouter() {
           path="/register"
           element={
             <AuthRoute>
-              <RegisterForm onNavigateToLogin={() => window.location.href = '/HMS/login'} />
+              <RegisterForm onNavigateToLogin={() => window.location.href = `${import.meta.env.BASE_URL}login`} />
             </AuthRoute>
           }
         />

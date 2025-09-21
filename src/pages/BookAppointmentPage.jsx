@@ -1,13 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Clock, User, Video, MessageSquare, Star, ChevronLeft } from 'lucide-react';
-import { mockDoctors } from '../data/mockData.js';
+import { Calendar, Clock, User, Video, MessageSquare, Star, ChevronLeft, Loader } from 'lucide-react';
 import { BookAppointmentModal } from '../components/Modals/BookAppointmentModal.jsx';
 
 export function BookAppointmentPage() {
   const navigate = useNavigate();
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // Fetch doctors from API
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:8080/api/doctors', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const doctorsData = await response.json();
+          setDoctors(doctorsData);
+        } else {
+          setError('Failed to load doctors');
+        }
+      } catch (err) {
+        setError('Network error while loading doctors');
+        console.error('Error fetching doctors:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDoctors();
+  }, []);
 
   const handleDoctorSelect = (doctor) => {
     setSelectedDoctor(doctor);
@@ -57,47 +87,60 @@ export function BookAppointmentPage() {
       {/* Doctors Grid */}
       <div>
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Choose Your Doctor</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockDoctors.map((doctor) => (
-            <div
-              key={doctor.id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
-            >
-              <div className="p-6">
-                <div className="flex items-center space-x-4 mb-4">
-                  <img
-                    src={doctor.avatar}
-                    alt={doctor.name}
-                    className="w-16 h-16 rounded-full object-cover"
-                  />
-                  <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white">{doctor.name}</h4>
-                    <p className="text-sm text-blue-600 dark:text-blue-400">{doctor.specialization}</p>
-                    <div className="flex items-center mt-1">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span className="text-sm text-gray-600 dark:text-gray-400 ml-1">{doctor.rating}</span>
+
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader className="animate-spin h-8 w-8 text-blue-600" />
+            <span className="ml-2 text-gray-600 dark:text-gray-400">Loading doctors...</span>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <div className="text-red-600 dark:text-red-400 mb-2">Error loading doctors</div>
+            <div className="text-sm text-gray-500 dark:text-gray-500">{error}</div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {doctors.map((doctor) => (
+              <div
+                key={doctor.id}
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
+              >
+                <div className="p-6">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <img
+                      src={doctor.avatar || 'https://via.placeholder.com/64x64?text=Doctor'}
+                      alt={doctor.name}
+                      className="w-16 h-16 rounded-full object-cover"
+                    />
+                    <div>
+                      <h4 className="font-semibold text-gray-900 dark:text-white">{doctor.name}</h4>
+                      <p className="text-sm text-blue-600 dark:text-blue-400">{doctor.specialization}</p>
+                      <div className="flex items-center mt-1">
+                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                        <span className="text-sm text-gray-600 dark:text-gray-400 ml-1">{doctor.rating || 'N/A'}</span>
+                      </div>
                     </div>
                   </div>
+
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">{doctor.bio || 'Experienced medical professional'}</p>
+
+                  <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-500 mb-4">
+                    <span>{doctor.experience || 'N/A'} experience</span>
+                    <span>{doctor.department || 'General'}</span>
+                  </div>
+
+                  <button
+                    onClick={() => handleDoctorSelect(doctor)}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition-colors duration-200 flex items-center justify-center space-x-2"
+                  >
+                    <Calendar size={16} />
+                    <span>Book Appointment</span>
+                  </button>
                 </div>
-
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">{doctor.bio}</p>
-
-                <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-500 mb-4">
-                  <span>{doctor.experience} experience</span>
-                  <span>{doctor.department}</span>
-                </div>
-
-                <button
-                  onClick={() => handleDoctorSelect(doctor)}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition-colors duration-200 flex items-center justify-center space-x-2"
-                >
-                  <Calendar size={16} />
-                  <span>Book Appointment</span>
-                </button>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Booking Modal */}

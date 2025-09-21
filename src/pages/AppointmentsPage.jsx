@@ -1,14 +1,79 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Calendar, Clock, User, MapPin, Phone, Video, MessageSquare, Plus } from 'lucide-react';
-import { mockAppointments } from '../data/mockData.js';
 
 export function AppointmentsPage() {
   const navigate = useNavigate();
   const [filterStatus, setFilterStatus] = useState('all');
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Get appointments for the current patient (assuming patient ID 1)
-  const patientAppointments = mockAppointments.filter(apt => apt.patientId === '1');
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
+
+  const fetchAppointments = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:8080/api/appointments/patient', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Transform data to match expected format
+        const transformedAppointments = data.map(apt => ({
+          id: apt.id,
+          patientId: apt.patient.id,
+          patientName: apt.patient.name,
+          doctorId: apt.doctor.id,
+          doctorName: apt.doctor.name,
+          date: apt.date,
+          time: apt.time,
+          status: apt.status.toLowerCase(),
+          reason: apt.reason,
+          notes: apt.notes,
+        }));
+        setAppointments(transformedAppointments);
+      } else {
+        setError('Failed to fetch appointments');
+      }
+    } catch (err) {
+      setError('Network error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancelAppointment = async (appointmentId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:8080/api/appointments/${appointmentId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: 'CANCELLED' }),
+      });
+
+      if (response.ok) {
+        // Update local state
+        setAppointments(prev => prev.map(apt =>
+          apt.id === appointmentId ? { ...apt, status: 'cancelled' } : apt
+        ));
+      } else {
+        setError('Failed to cancel appointment');
+      }
+    } catch (err) {
+      setError('Network error');
+    }
+  };
+
+  const patientAppointments = appointments;
 
   const filteredAppointments = patientAppointments.filter(apt => {
     if (filterStatus === 'all') return true;
@@ -103,7 +168,7 @@ export function AppointmentsPage() {
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow">
             <div className="text-2xl font-bold text-purple-600">
-              {patientAppointments.filter(apt => new Date(apt.date) > new Date()).length}
+              {patientAppointments.filter(apt => new Date(apt.date) > new Date() && apt.status !== 'cancelled').length}
             </div>
             <div className="text-sm text-gray-600 dark:text-gray-400">Upcoming</div>
           </div>
@@ -125,9 +190,23 @@ export function AppointmentsPage() {
         </div>
       </div>
 
+      {/* Loading and Error */}
+      {loading && (
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading appointments...</p>
+        </div>
+      )}
+
+      {error && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 px-4 py-3 rounded-md mb-4">
+          {error}
+        </div>
+      )}
+
       {/* Appointments List */}
       <div className="space-y-4">
-        {filteredAppointments.length === 0 ? (
+        {!loading && !error && filteredAppointments.length === 0 ? (
           <div className="text-center py-12">
             <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No appointments found</h3>
@@ -179,7 +258,11 @@ export function AppointmentsPage() {
                     <button className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
                       Reschedule
                     </button>
-                    <button className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <button
+                      onClick={() => handleCancelAppointment(appointment.id)}
+                      disabled={appointment.status === 'cancelled'}
+                      className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
                       Cancel
                     </button>
                   </div>
