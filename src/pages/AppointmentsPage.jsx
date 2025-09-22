@@ -16,7 +16,7 @@ export function AppointmentsPage() {
   const fetchAppointments = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8080/api/appointments/patient', {
+      const response = await fetch('http://localhost:8081/api/appointments/patient', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -51,7 +51,7 @@ export function AppointmentsPage() {
   const handleCancelAppointment = async (appointmentId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:8080/api/appointments/${appointmentId}/status`, {
+      const response = await fetch(`http://localhost:8081/api/appointments/${appointmentId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
