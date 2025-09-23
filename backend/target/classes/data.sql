@@ -1,10 +1,10 @@
 -- Insert sample users
 INSERT INTO users (email, password, name, role) VALUES
-('dr.sarah.johnson@medvault.com', '$2a$10$8K3W5Q8X9Y2Z4A6B8C0D2E4F6G8H0J2K4L6M8N0P2Q4R6S8T0V2W', 'Dr. Sarah Johnson', 'DOCTOR'),
-('dr.michael.chen@medvault.com', '$2a$10$8K3W5Q8X9Y2Z4A6B8C0D2E4F6G8H0J2K4L6M8N0P2Q4R6S8T0V2W', 'Dr. Michael Chen', 'DOCTOR'),
-('dr.amanda.rodriguez@medvault.com', '$2a$10$8K3W5Q8X9Y2Z4A6B8C0D2E4F6G8H0J2K4L6M8N0P2Q4R6S8T0V2W', 'Dr. Amanda Rodriguez', 'DOCTOR'),
-('patient1@medvault.com', '$2a$10$8K3W5Q8X9Y2Z4A6B8C0D2E4F6G8H0J2K4L6M8N0P2Q4R6S8T0V2W', 'John Smith', 'PATIENT'),
-('patient2@medvault.com', '$2a$10$8K3W5Q8X9Y2Z4A6B8C0D2E4F6G8H0J2K4L6M8N0P2Q4R6S8T0V2W', 'Emily Davis', 'PATIENT');
+('dr.sarah.johnson@medvault.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Dr. Sarah Johnson', 'DOCTOR'),
+('dr.michael.chen@medvault.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Dr. Michael Chen', 'DOCTOR'),
+('dr.amanda.rodriguez@medvault.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Dr. Amanda Rodriguez', 'DOCTOR'),
+('patient1@medvault.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'John Smith', 'PATIENT'),
+('patient2@medvault.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Emily Davis', 'PATIENT');
 
 -- Insert sample doctors
 INSERT INTO doctors (user_id, name, specialization, phone, department, avatar, experience, rating, bio) VALUES
