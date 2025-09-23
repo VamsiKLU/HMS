@@ -3,6 +3,12 @@ import PropTypes from 'prop-types';
 
 const AuthContext = createContext(undefined);
 
+// Determine backend URL based on environment
+const getBackendUrl = () => {
+  // Use environment variable if available, otherwise use Docker backend service port
+  return import.meta.env.VITE_API_URL || 'http://localhost:5000';
+};
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -19,7 +25,7 @@ export function AuthProvider({ children }) {
 
   const validateToken = async (token) => {
     try {
-      const response = await fetch('http://localhost:8081/api/auth/validate', {
+      const response = await fetch(`${getBackendUrl()}/api/auth/validate`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -41,33 +47,45 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password, role) => {
     try {
-      const response = await fetch('http://localhost:8081/api/auth/login', {
+      const response = await fetch(`${getBackendUrl()}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, role }),
       });
 
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('token', data.token);
         setUser(data.user);
-        return true; // Return true for success to match LoginForm expectation
+        return { success: true }; // Return success object with more details
       } else {
-        const errorData = await response.text();
-        console.error('Login failed:', errorData);
-        return false; // Return false for failure to match LoginForm expectation
+        let errorMessage = 'Invalid credentials. Please try again.';
+        try {
+          const errorData = await response.json();
+          if (errorData && errorData.message) {
+            errorMessage = errorData.message;
+          }
+        } catch (e) {
+          // If response is not JSON, try to get text
+          const errorText = await response.text();
+          if (errorText) {
+            errorMessage = errorText;
+          }
+        }
+        console.error('Login failed:', errorMessage);
+        return { success: false, error: errorMessage };
       }
     } catch (networkError) {
       console.error('Network error:', networkError);
-      return false;
+      return { success: false, error: 'Network error. Please check your connection.' };
     }
   };
 
   const register = async (userData) => {
     try {
-      const response = await fetch('http://localhost:8081/api/auth/register', {
+      const response = await fetch(`${getBackendUrl()}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -25,9 +25,9 @@ export function LoginForm({ onNavigateToRegister }) {
       return;
     }
 
-    const success = await login(formData.email, formData.password, formData.role);
-    if (!success) {
-      setError('Invalid credentials. Please try again.');
+    const result = await login(formData.email, formData.password, formData.role);
+    if (!result.success) {
+      setError(result.error || 'Invalid credentials. Please try again.');
     }
   };
 

@@ -8,6 +8,7 @@ import com.medvault.hmsbackend.repository.DoctorRepository;
 import com.medvault.hmsbackend.service.JwtService;
 import com.medvault.hmsbackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,7 +48,7 @@ public class AuthController {
             Optional<User> userOpt = userService.findByEmail(loginRequest.getEmail());
 
             if (userOpt.isEmpty()) {
-                return ResponseEntity.badRequest().body("User not found");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "User not found"));
             }
 
             User user = userOpt.get();
@@ -55,7 +56,14 @@ public class AuthController {
             // Check password using BCrypt
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-                return ResponseEntity.badRequest().body("Invalid password");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid credentials"));
+            }
+            
+            // Validate role if provided
+            if (loginRequest.getRole() != null && !loginRequest.getRole().isEmpty()) {
+                if (!user.getRole().equalsIgnoreCase(loginRequest.getRole())) {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid role for this user"));
+                }
             }
 
             // Create UserDetails for JWT
@@ -80,7 +88,7 @@ public class AuthController {
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Login failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", e.getMessage()));
         }
     }
 
@@ -92,53 +100,57 @@ public class AuthController {
 
         User user = new User();
         user.setEmail(registerRequest.getEmail());
+        // Password will be encoded in the service layer
         user.setPassword(registerRequest.getPassword());
         user.setName(registerRequest.getName());
-        user.setRole(User.Role.valueOf(registerRequest.getRole().toUpperCase()));
+        try {
+            user.setRole(User.Role.valueOf(registerRequest.getRole().toUpperCase()));
+            User savedUser = userService.registerUser(user);
 
-        User savedUser = userService.registerUser(user);
-
-        // Create Patient or Doctor entity
-        if (savedUser.getRoleEnum() == User.Role.PATIENT) {
-            Patient patient = new Patient();
-            patient.setUser(savedUser);
-            patient.setName(savedUser.getName());
-            patient.setPhone(registerRequest.getPhone() != null ? registerRequest.getPhone() : "");
-            patient.setAddress(registerRequest.getAddress());
-            patient.setEmergencyContact(registerRequest.getEmergencyContact());
-            // Calculate age from dateOfBirth
-            if (registerRequest.getDateOfBirth() != null && !registerRequest.getDateOfBirth().isEmpty()) {
-                try {
-                    java.time.LocalDate birthDate = java.time.LocalDate.parse(registerRequest.getDateOfBirth());
-                    int age = java.time.Period.between(birthDate, java.time.LocalDate.now()).getYears();
-                    patient.setAge(age);
-                } catch (Exception e) {
-                    patient.setAge(null);
+            // Create Patient or Doctor entity
+            if (savedUser.getRoleEnum() == User.Role.PATIENT) {
+                Patient patient = new Patient();
+                patient.setUser(savedUser);
+                patient.setName(savedUser.getName());
+                patient.setPhone(registerRequest.getPhone() != null ? registerRequest.getPhone() : "");
+                patient.setAddress(registerRequest.getAddress());
+                patient.setEmergencyContact(registerRequest.getEmergencyContact());
+                // Calculate age from dateOfBirth
+                if (registerRequest.getDateOfBirth() != null && !registerRequest.getDateOfBirth().isEmpty()) {
+                    try {
+                        java.time.LocalDate birthDate = java.time.LocalDate.parse(registerRequest.getDateOfBirth());
+                        int age = java.time.Period.between(birthDate, java.time.LocalDate.now()).getYears();
+                        patient.setAge(age);
+                    } catch (Exception e) {
+                        patient.setAge(null);
+                    }
                 }
+                // Store blood group in medical history
+                String medicalHistory = "";
+                if (registerRequest.getBloodGroup() != null) {
+                    medicalHistory = "Blood Group: " + registerRequest.getBloodGroup();
+                }
+                patient.setMedicalHistory(medicalHistory);
+                patientRepository.save(patient);
+            } else if (savedUser.getRoleEnum() == User.Role.DOCTOR) {
+                Doctor doctor = new Doctor();
+                doctor.setUser(savedUser);
+                doctor.setName(savedUser.getName());
+                doctor.setPhone(registerRequest.getPhone() != null ? registerRequest.getPhone() : "");
+                doctor.setSpecialization(registerRequest.getSpecialization());
+                // Store license number in bio
+                String bio = "";
+                if (registerRequest.getLicenseNumber() != null) {
+                    bio = "License Number: " + registerRequest.getLicenseNumber();
+                }
+                doctor.setBio(bio);
+                doctorRepository.save(doctor);
             }
-            // Store blood group in medical history
-            String medicalHistory = "";
-            if (registerRequest.getBloodGroup() != null) {
-                medicalHistory = "Blood Group: " + registerRequest.getBloodGroup();
-            }
-            patient.setMedicalHistory(medicalHistory);
-            patientRepository.save(patient);
-        } else if (savedUser.getRoleEnum() == User.Role.DOCTOR) {
-            Doctor doctor = new Doctor();
-            doctor.setUser(savedUser);
-            doctor.setName(savedUser.getName());
-            doctor.setPhone(registerRequest.getPhone() != null ? registerRequest.getPhone() : "");
-            doctor.setSpecialization(registerRequest.getSpecialization());
-            // Store license number in bio
-            String bio = "";
-            if (registerRequest.getLicenseNumber() != null) {
-                bio = "License Number: " + registerRequest.getLicenseNumber();
-            }
-            doctor.setBio(bio);
-            doctorRepository.save(doctor);
-        }
 
-        return ResponseEntity.ok(savedUser);
+            return ResponseEntity.ok(savedUser);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());
+        }
     }
 
     @GetMapping("/validate")
@@ -162,12 +174,15 @@ public class AuthController {
     public static class LoginRequest {
         private String email;
         private String password;
+        private String role;
 
         // getters and setters
         public String getEmail() { return email; }
         public void setEmail(String email) { this.email = email; }
         public String getPassword() { return password; }
         public void setPassword(String password) { this.password = password; }
+        public String getRole() { return role; }
+        public void setRole(String role) { this.role = role; }
     }
 
     public static class RegisterRequest {

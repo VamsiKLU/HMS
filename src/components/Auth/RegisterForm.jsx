@@ -56,8 +56,8 @@ export function RegisterForm({ onNavigateToLogin }) {
       return;
     }
 
-    const success = await register(formData);
-    if (success) {
+    const result = await register(formData);
+    if (result.success) {
       setSuccess('Registration successful! You can now login.');
       // Clear form
       setFormData({
@@ -74,8 +74,12 @@ export function RegisterForm({ onNavigateToLogin }) {
         emergencyContact: '',
         bloodGroup: '',
       });
+      // Redirect to login after successful registration
+      setTimeout(() => {
+        onNavigateToLogin();
+      }, 2000);
     } else {
-      setError('Registration failed. Please try again.');
+      setError(result.error || 'Registration failed. Please try again.');
     }
   };
 
@@ -451,4 +455,4 @@ export function RegisterForm({ onNavigateToLogin }) {
 
 RegisterForm.propTypes = {
   onNavigateToLogin: PropTypes.func.isRequired
-}; 
+};
