@@ -45,7 +45,7 @@ pipeline {
                     // Wait for backend to be up
                     retry(10) {
                         sleep time: 6, unit: 'SECONDS'
-                        sh 'curl -sSf http://localhost:9091/actuator/health || (echo "Backend not ready yet" && false)'
+                        sh 'curl -sSf http://localhost:9091/api/doctors || (echo "Backend not ready yet" && false)'
                     }
                     // Wait for frontend to be up
                     retry(10) {
