@@ -1,31 +1,29 @@
-version: '3.8'
-
 services:
-  frontend:
-    build: .
+  hms-frontend:
+    build: frontend
     ports:
-      - "3000:80"
+      - "80:80"
     depends_on:
-      - backend
+      - hms-backend
     networks:
       - app-network
 
-  backend:
-    build: ./backend
+  hms-backend:
+    build: backend
     ports:
-      - "5000:5000"
+      - "9091:5000"
     depends_on:
-      db:
+      hms-db:
         condition: service_healthy
     environment:
-      - DATABASE_URL=jdbc:mysql://db:3306/hms_db
+      - DATABASE_URL=jdbc:mysql://hms-db:3306/hms_db
       - DB_USERNAME=user
       - DB_PASSWORD=password
       - PORT=5000
     networks:
       - app-network
 
-  db:
+  hms-db:
     image: mysql:8.0
     ports:
       - "3307:3306"
