@@ -4,6 +4,8 @@ pipeline {
     environment {
         PROJECT_NAME = 'hms'
         DOCKER_COMPOSE_CMD = 'docker compose'
+        DOCKER_BUILDKIT = '1'
+        COMPOSE_DOCKER_CLI_BUILD = '1'
     }
 
     options {
@@ -25,9 +27,9 @@ pipeline {
             }
         }
 
-        stage('Build Images') {
+        stage('Build Images (cached)') {
             steps {
-                sh "${DOCKER_COMPOSE_CMD} build --no-cache"
+                sh "${DOCKER_COMPOSE_CMD} build"
             }
         }
 
