@@ -25,7 +25,7 @@ export function BookAppointmentModal({ onClose }) {
     const fetchDoctors = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:9091/api/doctors', {
+        const response = await fetch('/api/doctors', {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -77,7 +77,7 @@ export function BookAppointmentModal({ onClose }) {
         reason: formData.reason || 'General consultation'
       };
 
-      const response = await fetch('http://localhost:9091/api/appointments/book', {
+      const response = await fetch('/api/appointments/book', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

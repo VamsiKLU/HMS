@@ -19,7 +19,7 @@ export function DoctorAppointmentsPage() {
   const fetchAppointments = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:9091/api/appointments/doctor', {
+      const response = await fetch('/api/appointments/doctor', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

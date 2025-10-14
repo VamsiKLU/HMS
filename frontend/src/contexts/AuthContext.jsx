@@ -21,6 +21,22 @@ export function AuthProvider({ children }) {
     // Check if token exists and validate it
     const token = localStorage.getItem('token');
     if (token) {
+      // Check if token is expired (basic check)
+      try {
+        const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+        const currentTime = Math.floor(Date.now() / 1000);
+        if (tokenPayload.exp && tokenPayload.exp < currentTime) {
+          // Token is expired, remove it
+          localStorage.removeItem('token');
+          setIsLoading(false);
+          return;
+        }
+      } catch (error) {
+        // Invalid token format, remove it
+        localStorage.removeItem('token');
+        setIsLoading(false);
+        return;
+      }
       validateToken(token);
     } else {
       setIsLoading(false);
@@ -39,11 +55,15 @@ export function AuthProvider({ children }) {
         const data = await response.json();
         setUser(data.user);
       } else {
+        // Token is invalid, clear it
         localStorage.removeItem('token');
+        setUser(null);
       }
     } catch (error) {
       console.error('Token validation failed:', error);
+      // Network error or invalid token, clear it
       localStorage.removeItem('token');
+      setUser(null);
     } finally {
       setIsLoading(false);
     }

@@ -16,7 +16,7 @@ export function BookAppointmentPage() {
     const fetchDoctors = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:9091/api/doctors');
+        const response = await fetch('/api/doctors');
 
         if (response.ok) {
           const doctorsData = await response.json();
