@@ -1,0 +1,18 @@
+---
+# Production-specific overrides
+# IMPORTANT: Override these with Ansible Vault for security
+
+# Database credentials - USE VAULT IN PRODUCTION
+# db_username: prod_user
+# db_password: "{{ vault_db_password }}"
+# db_root_password: "{{ vault_db_root_password }}"
+
+# JWT Secret - USE VAULT IN PRODUCTION
+# jwt_secret: "{{ vault_jwt_secret }}"
+
+# CORS origins for production
+cors_origins: "https://your-domain.com,https://www.your-domain.com"
+
+# Backend URL for frontend
+backend_url: "https://api.your-domain.com"
+

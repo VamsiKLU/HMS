@@ -1,0 +1,9 @@
+*.retry
+.vault_pass
+*.log
+host_vars/
+group_vars/*/vault.yml
+*.swp
+*.swo
+*~
+

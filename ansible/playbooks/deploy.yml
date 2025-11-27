@@ -1,0 +1,25 @@
+---
+- name: Deploy HMS Application
+  hosts: all
+  become: yes
+  vars:
+    app_name: hms
+    docker_compose_version: "2.24.0"
+    project_dir: /opt/{{ app_name }}
+    frontend_port: 3000
+    backend_port: 9091
+    db_port: 3307
+    
+  tasks:
+    - name: Include prerequisites role
+      include_role:
+        name: prerequisites
+
+    - name: Include application deployment role
+      include_role:
+        name: deploy
+
+    - name: Verify services are running
+      include_role:
+        name: verify
+

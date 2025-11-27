@@ -1,0 +1,22 @@
+---
+# Default configuration for all hosts
+app_name: hms
+project_dir: /opt/hms
+
+# Ports
+frontend_port: 3000
+backend_port: 9091
+db_port: 3307
+
+# Database credentials (override in production with vault)
+db_username: user
+db_password: password
+db_root_password: password
+
+# Backend configuration
+jwt_secret: mySuperSecretKeyThatIsAtLeast32CharactersLongForJWT
+cors_origins: "http://localhost:3000,http://localhost:5173,http://localhost:80"
+
+# Frontend configuration
+backend_url: "http://localhost:9091"
+
